@@ -41,6 +41,7 @@ import java.io.File
 import java.util.EnumSet
 import javax.inject.Inject
 import javax.inject.Singleton
+import org.koitharu.kotatsu.core.domain.MangaDataCleanupUseCase
 
 private const val MAX_PARALLELISM = 4
 private const val FILENAME_SKIP = ".notamanga"
@@ -52,6 +53,7 @@ class LocalMangaRepository @Inject constructor(
 	@LocalStorageChanges private val localStorageChanges: MutableSharedFlow<LocalManga?>,
 	private val settings: AppSettings,
 	private val lock: MangaLock,
+	private val mangaDataCleanupUseCase: MangaDataCleanupUseCase,
 ) : MangaRepository {
 
 	override val source = LocalMangaSource
@@ -143,6 +145,8 @@ class LocalMangaRepository @Inject constructor(
 		val result = file.deleteAwait()
 		if (result) {
 			localMangaIndex.delete(manga.id)
+			// Clean up edge bounds cache for this manga
+			mangaDataCleanupUseCase.cleanupMangaEdgeBounds(manga)
 			localStorageChanges.emit(null)
 		}
 		return result

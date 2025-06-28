@@ -16,6 +16,7 @@ import org.koitharu.kotatsu.core.parser.MangaDataRepository
 import org.koitharu.kotatsu.core.prefs.AppSettings
 import org.koitharu.kotatsu.local.data.LocalMangaRepository
 import org.koitharu.kotatsu.local.domain.DeleteReadChaptersUseCase
+import org.koitharu.kotatsu.core.domain.MangaDataCleanupUseCase
 import java.util.concurrent.TimeUnit
 
 @HiltWorker
@@ -26,12 +27,16 @@ class LocalStorageCleanupWorker @AssistedInject constructor(
 	private val localMangaRepository: LocalMangaRepository,
 	private val dataRepository: MangaDataRepository,
 	private val deleteReadChaptersUseCase: DeleteReadChaptersUseCase,
+	private val mangaDataCleanupUseCase: MangaDataCleanupUseCase,
 ) : CoroutineWorker(appContext, params) {
 
 	override suspend fun doWork(): Result {
 		if (settings.isAutoLocalChaptersCleanupEnabled) {
 			deleteReadChaptersUseCase.invoke()
 		}
+		// Clean up old edge bounds cache entries
+		mangaDataCleanupUseCase.cleanupOldEdgeBounds()
+		
 		return if (localMangaRepository.cleanup()) {
 			dataRepository.cleanupLocalManga()
 			Result.success()

@@ -78,6 +78,7 @@ import java.util.zip.ZipFile
 import javax.inject.Inject
 import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.CoroutineContext
+import org.koitharu.kotatsu.core.db.MangaDatabase
 
 @ActivityRetainedScoped
 class PageLoader @Inject constructor(
@@ -90,6 +91,7 @@ class PageLoader @Inject constructor(
 	private val mangaRepositoryFactory: MangaRepository.Factory,
 	private val imageProxyInterceptor: ImageProxyInterceptor,
 	private val downloadSlowdownDispatcher: DownloadSlowdownDispatcher,
+	private val database: MangaDatabase,
 ) {
 
 	val loaderScope = lifecycle.lifecycleScope + InternalErrorHandler() + Dispatchers.Default
@@ -104,7 +106,7 @@ class PageLoader @Inject constructor(
 	private val prefetchQueue = LinkedList<MangaPage>()
 	private val counter = AtomicInteger(0)
 	private var prefetchQueueLimit = PREFETCH_LIMIT_DEFAULT // TODO adaptive
-	private val edgeDetector = EdgeDetector(context)
+	private val edgeDetector = EdgeDetector(context, database)
 
 	fun isPrefetchApplicable(): Boolean {
 		return repository is CachingMangaRepository
@@ -210,8 +212,8 @@ class PageLoader @Inject constructor(
 		}
 	}
 
-	suspend fun getTrimmedBounds(uri: Uri): Rect? = runCatchingCancellable {
-		edgeDetector.getBounds(ImageSource.uri(uri))
+	suspend fun getTrimmedBounds(uri: Uri, pageUrl: String): Rect? = runCatchingCancellable {
+		edgeDetector.getBounds(ImageSource.uri(uri), pageUrl)
 	}.onFailure { error ->
 		error.printStackTraceDebug()
 	}.getOrNull()

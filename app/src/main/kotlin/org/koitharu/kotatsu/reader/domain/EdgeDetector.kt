@@ -22,19 +22,38 @@ import kotlinx.coroutines.runInterruptible
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import org.koitharu.kotatsu.core.db.MangaDatabase
+import org.koitharu.kotatsu.core.db.entity.EdgeBoundsEntity
 import org.koitharu.kotatsu.core.util.SynchronizedSieveCache
 import org.koitharu.kotatsu.core.util.ext.use
 import kotlin.math.abs
 
-class EdgeDetector(private val context: Context) {
+class EdgeDetector(
+	private val context: Context,
+	private val database: MangaDatabase,
+) {
 
 	private val mutex = Mutex()
-	private val cache = SynchronizedSieveCache<ImageSource, Rect>(CACHE_SIZE)
+	private val memoryCache = SynchronizedSieveCache<String, Rect>(CACHE_SIZE)
+	private val edgeBoundsDao = database.getEdgeBoundsDao()
 
-	suspend fun getBounds(imageSource: ImageSource): Rect? {
-		cache[imageSource]?.let { rect ->
+	suspend fun getBounds(imageSource: ImageSource, pageUrl: String): Rect? {
+		// Check memory cache first
+		memoryCache[pageUrl]?.let { rect ->
 			return if (rect.isEmpty) null else rect
 		}
+
+		// Check database cache
+		val dbCache = withContext(Dispatchers.IO) {
+			edgeBoundsDao.findByPageUrl(pageUrl)
+		}
+		if (dbCache != null) {
+			val rect = Rect(dbCache.leftEdge, dbCache.topEdge, dbCache.rightEdge, dbCache.bottomEdge)
+			memoryCache.put(pageUrl, rect)
+			return if (rect.isEmpty) null else rect
+		}
+
+		// Calculate bounds if not cached
 		return mutex.withLock {
 			withContext(Dispatchers.IO) {
 				val decoder = SkiaPooledImageRegionDecoder(Bitmap.Config.RGB_565)
@@ -67,8 +86,23 @@ class EdgeDetector(private val context: Context) {
 					decoder.recycle()
 				}
 			}
-		}.also {
-			cache.put(imageSource, it ?: EMPTY_RECT)
+		}.also { result ->
+			val rect = result ?: EMPTY_RECT
+			// Store in memory cache
+			memoryCache.put(pageUrl, rect)
+			// Store in database cache
+			withContext(Dispatchers.IO) {
+				edgeBoundsDao.insert(
+					EdgeBoundsEntity(
+						pageUrl = pageUrl,
+						leftEdge = rect.left,
+						topEdge = rect.top,
+						rightEdge = rect.right,
+						bottomEdge = rect.bottom,
+						createdAt = System.currentTimeMillis()
+					)
+				)
+			}
 		}
 	}
 

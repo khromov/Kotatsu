@@ -39,12 +39,14 @@ class PageViewModel(
 	private val scope = loader.loaderScope + Dispatchers.Main.immediate
 	private var job: Job? = null
 	private var cachedBounds: Rect? = null
+	private var currentPage: MangaPage? = null
 
 	val state = MutableStateFlow<PageState>(PageState.Empty)
 
 	fun isLoading() = job?.isActive == true
 
 	fun onBind(page: MangaPage) {
+		currentPage = page
 		val prevJob = job
 		job = scope.launch(Dispatchers.Default) {
 			prevJob?.cancelAndJoin()
@@ -53,6 +55,7 @@ class PageViewModel(
 	}
 
 	fun retry(page: MangaPage, isFromUser: Boolean) {
+		currentPage = page
 		val prevJob = job
 		job = scope.launch {
 			prevJob?.cancelAndJoin()
@@ -76,6 +79,7 @@ class PageViewModel(
 	fun onRecycle() {
 		state.value = PageState.Empty
 		cachedBounds = null
+		currentPage = null
 		job?.cancel()
 	}
 
@@ -115,7 +119,13 @@ class PageViewModel(
 			try {
 				val newUri = loader.convertBimap(uri)
 				cachedBounds = if (settingsProducer.value.isPagesCropEnabled(isWebtoon)) {
-					loader.getTrimmedBounds(newUri)
+					val page = currentPage
+					if (page != null) {
+						val pageUrl = loader.getPageUrl(page)
+						loader.getTrimmedBounds(newUri, pageUrl)
+					} else {
+						null
+					}
 				} else {
 					null
 				}
@@ -146,7 +156,8 @@ class PageViewModel(
 			progressObserver.cancelAndJoin()
 			previewJob.cancel()
 			cachedBounds = if (settingsProducer.value.isPagesCropEnabled(isWebtoon)) {
-				loader.getTrimmedBounds(uri)
+				val pageUrl = loader.getPageUrl(data)
+				loader.getTrimmedBounds(uri, pageUrl)
 			} else {
 				null
 			}
