@@ -104,7 +104,7 @@ class PageLoader @Inject constructor(
 	private val prefetchQueue = LinkedList<MangaPage>()
 	private val counter = AtomicInteger(0)
 	private var prefetchQueueLimit = PREFETCH_LIMIT_DEFAULT // TODO adaptive
-	private val edgeDetector = EdgeDetector(context)
+	private val edgeDetector = EdgeDetectorGPU(context)
 
 	fun isPrefetchApplicable(): Boolean {
 		return repository is CachingMangaRepository
