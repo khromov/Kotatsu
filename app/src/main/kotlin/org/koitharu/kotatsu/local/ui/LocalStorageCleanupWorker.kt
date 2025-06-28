@@ -34,7 +34,7 @@ class LocalStorageCleanupWorker @AssistedInject constructor(
 		if (settings.isAutoLocalChaptersCleanupEnabled) {
 			deleteReadChaptersUseCase.invoke()
 		}
-		// Clean up old edge bounds cache entries
+
 		mangaDataCleanupUseCase.cleanupOldEdgeBounds()
 		
 		return if (localMangaRepository.cleanup()) {
