@@ -38,10 +38,13 @@ class EdgeDetector(
 	private val edgeBoundsDao = database.getEdgeBoundsDao()
 
 	suspend fun getBounds(imageSource: ImageSource, pageUrl: String): Rect? {
+		
 		// Check memory cache first
 		memoryCache[pageUrl]?.let { rect ->
 			return if (rect.isEmpty) null else rect
 		}
+
+
 
 		// Check database cache
 		val dbCache = withContext(Dispatchers.IO) {
