@@ -145,8 +145,6 @@ class LocalMangaRepository @Inject constructor(
 		val result = file.deleteAwait()
 		if (result) {
 			localMangaIndex.delete(manga.id)
-			// Clean up edge bounds cache for this manga
-			mangaDataCleanupUseCase.cleanupMangaEdgeBounds(manga)
 			localStorageChanges.emit(null)
 		}
 		return result
