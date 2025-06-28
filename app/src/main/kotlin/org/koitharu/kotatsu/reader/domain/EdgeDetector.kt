@@ -56,7 +56,6 @@ class EdgeDetector(
 			return if (rect.isEmpty) null else rect
 		}
 
-		// Calculate bounds if not cached
 		return mutex.withLock {
 			withContext(Dispatchers.IO) {
 				val decoder = SkiaPooledImageRegionDecoder(Bitmap.Config.RGB_565)
