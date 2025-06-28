@@ -18,7 +18,6 @@ class Migration26To27 : Migration(26, 27) {
 			)""",
 		)
 
-		// Create index for faster cleanup by timestamp
 		db.execSQL("CREATE INDEX IF NOT EXISTS `index_edge_bounds_created_at` ON `edge_bounds` (`created_at`)")
 	}
 }
