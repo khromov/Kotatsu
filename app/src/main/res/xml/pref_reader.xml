@@ -101,6 +101,13 @@
 		android:title="@string/crop_pages" />
 
 	<SwitchPreferenceCompat
+		android:defaultValue="false"
+		android:dependency="reader_crop"
+		android:key="reader_crop_gpu_enabled"
+		android:summary="@string/reader_crop_gpu_summary"
+		android:title="@string/reader_crop_gpu_title" />
+
+	<SwitchPreferenceCompat
 		android:defaultValue="true"
 		android:key="reader_fullscreen"
 		android:summary="@string/reader_fullscreen_summary"

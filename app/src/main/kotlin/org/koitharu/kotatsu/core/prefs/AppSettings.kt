@@ -543,6 +543,9 @@ class AppSettings @Inject constructor(@ApplicationContext context: Context) {
 		return needle.toString() in rawValue
 	}
 
+	val isPagesCropGpuEnabled: Boolean
+		get() = !prefs.getBoolean(KEY_READER_CROP_GPU_ENABLED, false)
+
 	fun isTipEnabled(tip: String): Boolean {
 		return prefs.getStringSet(KEY_TIPS_CLOSED, emptySet())?.contains(tip) != true
 	}
@@ -653,6 +656,7 @@ class AppSettings @Inject constructor(@ApplicationContext context: Context) {
 		const val KEY_READER_MODE = "reader_mode"
 		const val KEY_READER_MODE_DETECT = "reader_mode_detect"
 		const val KEY_READER_CROP = "reader_crop"
+		const val KEY_READER_CROP_GPU_ENABLED = "reader_crop_gpu_enabled"
 		const val KEY_APP_PASSWORD = "app_password"
 		const val KEY_APP_PASSWORD_NUMERIC = "app_password_num"
 		const val KEY_PROTECT_APP = "protect_app"

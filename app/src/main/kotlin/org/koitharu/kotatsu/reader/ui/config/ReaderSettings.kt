@@ -98,6 +98,7 @@ data class ReaderSettings(
 			AppSettings.KEY_CF_INVERTED,
 			AppSettings.KEY_CF_GRAYSCALE,
 			AppSettings.KEY_READER_CROP,
+			AppSettings.KEY_READER_CROP_GPU_ENABLED,
 		)
 		private var job: Job? = null
 

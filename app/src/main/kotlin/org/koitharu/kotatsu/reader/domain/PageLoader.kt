@@ -104,7 +104,8 @@ class PageLoader @Inject constructor(
 	private val prefetchQueue = LinkedList<MangaPage>()
 	private val counter = AtomicInteger(0)
 	private var prefetchQueueLimit = PREFETCH_LIMIT_DEFAULT // TODO adaptive
-	private val edgeDetector = EdgeDetectorGPU(context)
+	private val edgeDetectorGPU = EdgeDetectorGPU(context)
+	private val edgeDetectorCPU = EdgeDetector(context)
 
 	fun isPrefetchApplicable(): Boolean {
 		return repository is CachingMangaRepository
@@ -211,7 +212,11 @@ class PageLoader @Inject constructor(
 	}
 
 	suspend fun getTrimmedBounds(uri: Uri): Rect? = runCatchingCancellable {
-		edgeDetector.getBounds(ImageSource.uri(uri))
+		if (settings.isPagesCropGpuEnabled) {
+			edgeDetectorGPU.getBounds(ImageSource.uri(uri))
+		} else {
+			edgeDetectorCPU.getBounds(ImageSource.uri(uri))
+		}
 	}.onFailure { error ->
 		error.printStackTraceDebug()
 	}.getOrNull()
