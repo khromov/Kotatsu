@@ -88,9 +88,7 @@ class EdgeDetector(
 			}
 		}.also { result ->
 			val rect = result ?: EMPTY_RECT
-			// Store in memory cache
 			memoryCache.put(pageUrl, rect)
-			// Store in database cache
 			withContext(Dispatchers.IO) {
 				edgeBoundsDao.insert(
 					EdgeBoundsEntity(
