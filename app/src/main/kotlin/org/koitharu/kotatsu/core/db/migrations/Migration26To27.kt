@@ -20,9 +20,5 @@ class Migration26To27 : Migration(26, 27) {
 
 		// Create index for faster cleanup by timestamp
 		db.execSQL("CREATE INDEX IF NOT EXISTS `index_edge_bounds_created_at` ON `edge_bounds` (`created_at`)")
-
-		// Clean up old entries (older than 30 days)
-		val thirtyDaysAgo = System.currentTimeMillis() - (30L * 24 * 60 * 60 * 1000)
-		db.execSQL("DELETE FROM `edge_bounds` WHERE `created_at` < $thirtyDaysAgo")
 	}
 }
