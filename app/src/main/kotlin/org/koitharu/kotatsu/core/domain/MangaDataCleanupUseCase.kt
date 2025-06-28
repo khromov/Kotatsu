@@ -10,16 +10,6 @@ import javax.inject.Inject
 class MangaDataCleanupUseCase @Inject constructor(
 	private val database: MangaDatabase,
 ) {
-
-	/**
-	 * Clean up all data related to a manga when it's deleted
-	 */
-	suspend fun cleanupMangaData(mangaId: Long) {
-		// Clean up edge bounds cache for all pages of this manga
-		// We use a pattern to match all URLs that might belong to this manga
-		database.getEdgeBoundsDao().deleteByUrlPattern("%/manga/$mangaId/%")
-	}
-
 	/**
 	 * Clean up old edge bounds entries (older than 30 days)
 	 */
