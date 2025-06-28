@@ -2,9 +2,15 @@ package org.koitharu.kotatsu.core.db.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "edge_bounds")
+@Entity(
+	tableName = "edge_bounds",
+	indices = [
+		Index(value = ["created_at"], name = "index_edge_bounds_created_at")
+	]
+)
 data class EdgeBoundsEntity(
 	@PrimaryKey
 	@ColumnInfo(name = "page_url")
