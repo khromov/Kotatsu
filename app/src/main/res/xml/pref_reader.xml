@@ -94,6 +94,15 @@
 		android:title="@string/enhanced_colors"
 		app:allowDividerAbove="true" />
 
+	<ListPreference
+		android:defaultValue="2"
+		android:entries="@array/image_quality"
+		android:entryValues="@array/values_image_quality"
+		android:key="image_quality"
+		android:summary="@string/image_quality_summary"
+		android:title="@string/image_quality"
+		app:useSimpleSummaryProvider="true" />
+
 	<SwitchPreferenceCompat
 		android:defaultValue="false"
 		android:key="reader_optimize"

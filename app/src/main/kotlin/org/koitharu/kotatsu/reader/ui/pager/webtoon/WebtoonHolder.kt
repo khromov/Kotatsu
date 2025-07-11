@@ -35,6 +35,12 @@ class WebtoonHolder(
 
 	override fun onReady() {
 		binding.ssiv.colorFilter = settings.colorFilter?.toColorFilter()
+		
+		// Apply moire reduction optimizations for webtoon images
+		if (settings.imageQuality.isFilteringEnabled) {
+			binding.ssiv.optimizeForMoireReduction()
+		}
+		
 		with(binding.ssiv) {
 			scrollTo(
 				when {

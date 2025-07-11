@@ -18,6 +18,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import org.koitharu.kotatsu.R
 import org.koitharu.kotatsu.core.model.ZoomMode
 import org.koitharu.kotatsu.core.network.DoHProvider
+import org.koitharu.kotatsu.core.prefs.ImageQuality
 import org.koitharu.kotatsu.core.util.ext.connectivityManager
 import org.koitharu.kotatsu.core.util.ext.getEnumValue
 import org.koitharu.kotatsu.core.util.ext.observe
@@ -509,6 +510,9 @@ class AppSettings @Inject constructor(@ApplicationContext context: Context) {
 	val is32BitColorsEnabled: Boolean
 		get() = prefs.getBoolean(KEY_32BIT_COLOR, false)
 
+	val imageQuality: ImageQuality
+		get() = prefs.getEnumValue(KEY_IMAGE_QUALITY, ImageQuality.BALANCED)
+
 	val isPeriodicalBackupEnabled: Boolean
 		get() = prefs.getBoolean(KEY_BACKUP_PERIODICAL_ENABLED, false)
 
@@ -744,6 +748,7 @@ class AppSettings @Inject constructor(@ApplicationContext context: Context) {
 		const val KEY_NAV_LABELS = "nav_labels"
 		const val KEY_NAV_PINNED = "nav_pinned"
 		const val KEY_32BIT_COLOR = "enhanced_colors"
+		const val KEY_IMAGE_QUALITY = "image_quality"
 		const val KEY_SOURCES_ORDER = "sources_sort_order"
 		const val KEY_SOURCES_CATALOG = "sources_catalog"
 		const val KEY_CF_BRIGHTNESS = "cf_brightness"

@@ -102,6 +102,11 @@
 		<item>@string/pages</item>
 		<item>@string/webtoon</item>
 	</string-array>
+	<string-array name="image_quality" translatable="false">
+		<item>@string/performance</item>
+		<item>@string/balanced</item>
+		<item>@string/quality</item>
+	</string-array>
 	<string-array name="progress_indicators" translatable="false">
 		<item>@string/disabled</item>
 		<item>@string/percent_read</item>

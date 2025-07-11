@@ -24,6 +24,7 @@ import org.koitharu.kotatsu.core.util.ext.getDisplayMessage
 import org.koitharu.kotatsu.core.util.ext.isLowRamDevice
 import org.koitharu.kotatsu.core.util.ext.isSerializable
 import org.koitharu.kotatsu.core.util.ext.observe
+import org.koitharu.kotatsu.core.prefs.ImageQuality
 import org.koitharu.kotatsu.databinding.LayoutPageInfoBinding
 import org.koitharu.kotatsu.parsers.util.ifZero
 import org.koitharu.kotatsu.reader.domain.PageLoader
@@ -199,8 +200,24 @@ abstract class BasePageHolder<B : ViewBinding>(
 		downSampling = when {
 			isForeground || !settings.isReaderOptimizationEnabled -> 1
 			BuildConfig.DEBUG -> 32
-			context.isLowRamDevice() -> 8
-			else -> 4
+			context.isLowRamDevice() -> getOptimalDownSamplingForLowRam()
+			else -> getOptimalDownSampling()
+		}
+	}
+
+	private fun getOptimalDownSampling(): Int {
+		return when (settings.imageQuality) {
+			ImageQuality.PERFORMANCE -> settings.imageQuality.maxDownSampling
+			ImageQuality.BALANCED -> settings.imageQuality.maxDownSampling
+			ImageQuality.QUALITY -> settings.imageQuality.maxDownSampling
+		}
+	}
+
+	private fun getOptimalDownSamplingForLowRam(): Int {
+		return when (settings.imageQuality) {
+			ImageQuality.PERFORMANCE -> 16
+			ImageQuality.BALANCED -> 8
+			ImageQuality.QUALITY -> 4
 		}
 	}
 }

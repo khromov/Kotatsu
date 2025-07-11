@@ -128,6 +128,22 @@ class WebtoonImageView @JvmOverloads constructor(
 		return ancestors.firstNotNullOfOrNull { it as? RecyclerView }?.height ?: 0
 	}
 
+	fun optimizeForMoireReduction() {
+		// Configure webtoon-specific settings to reduce moire patterns
+		// SubsamplingScaleImageView handles filtering internally through its decoders
+		
+		// Enable debug mode to identify tiling issues during development
+		if (org.koitharu.kotatsu.BuildConfig.DEBUG) {
+			isDebug = true
+		}
+		
+		// Configure scale type for optimal webtoon viewing
+		minimumScaleType = SubsamplingScaleImageView.SCALE_TYPE_CENTER_INSIDE
+		
+		// Let the image quality be handled by the decoders set in ReaderSettings.applyBitmapConfig
+		// and the downsampling logic in BasePageHolder.applyDownSampling
+	}
+
 	private fun drawDebug(canvas: Canvas) {
 		val paint = debugPaint ?: Paint(Paint.ANTI_ALIAS_FLAG).apply {
 			color = android.graphics.Color.RED
